@@ -9,25 +9,24 @@ def resize_image(input_file_path, output_file_path=None, desired_image_path=None
     if desired_image_path is None:
         raise ValueError("A desired_image_path must be provided.")
 
-    # Read the desired image to get its size
+    # Read the reference image
     desired_image = sitk.ReadImage(desired_image_path)
     desired_size = desired_image.GetSize()
 
     input_size = input_image.GetSize()
 
-    # Calculate the difference in size
+    # difference in size
     delta_width = desired_size[0] - input_size[0]
     delta_height = desired_size[1] - input_size[1]
 
-    # Initialize crop and pad sizes
     crop_left = crop_right = 0
     crop_top = crop_bottom = 0
     pad_left = pad_right = 0
     pad_top = pad_bottom = 0
 
-    # Determine cropping or padding for width
+    # Calc cropping or padding for width
     if delta_width < 0:
-        # Need to crop width
+        # crop width
         crop_amount = -delta_width
         crop_left = int(crop_amount / 2)
         crop_right = int(crop_amount - crop_left)
@@ -37,14 +36,14 @@ def resize_image(input_file_path, output_file_path=None, desired_image_path=None
         pad_left = int(pad_amount / 2)
         pad_right = int(pad_amount - pad_left)
 
-    # Determine cropping or padding for height
+    # Calc cropping or padding for height
     if delta_height < 0:
-        # Need to crop height
+        # crop height
         crop_amount = -delta_height
         crop_top = int(crop_amount / 2)
         crop_bottom = int(crop_amount - crop_top)
     elif delta_height > 0:
-        # Need to pad height
+        # pad height
         pad_amount = delta_height
         pad_top = int(pad_amount / 2)
         pad_bottom = int(pad_amount - pad_top)
@@ -77,7 +76,7 @@ def resize_image(input_file_path, output_file_path=None, desired_image_path=None
             padded_array = np.pad(
                 input_array, pad_width, mode="constant", constant_values=border_color
             )
-            # Convert back to SimpleITK image
+            # Convert to SimpleITK image
             padded_image = sitk.GetImageFromArray(padded_array.astype(np.uint8))
         else:
             # Color image
@@ -92,7 +91,7 @@ def resize_image(input_file_path, output_file_path=None, desired_image_path=None
                 (pad_top, pad_bottom),
                 (pad_left, pad_right),
                 (0, 0),
-            )  # Do not pad the channels
+            )
             padded_array = np.pad(
                 input_array, pad_width, mode="constant", constant_values=0
             )
